@@ -1,0 +1,15 @@
+{
+  "name": "js-joiner",
+  "version": "1.0.0",
+  "description": "Joins and minifies js files in dir. Can watch folder and work authomaticaly. Can ignore files of folder listed in ignore.json",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Alexander Amirov",
+  "license": "ISC",
+  "dependencies": {
+    "harp-minify": "^0.4.0",
+    "minimist": "^1.2.0"
+  }
+}
