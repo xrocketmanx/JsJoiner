@@ -1,6 +1,5 @@
 {
 	"resultFileName": "script.js",
-	"watch": true,
-	"min": false,
+	"ignoreFileName": "ignore.json",
 	"dir": "./"
 }
