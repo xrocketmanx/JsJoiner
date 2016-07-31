@@ -1,8 +1,8 @@
 {
-  "name": "js-joiner",
+  "name": "joinerjs",
   "version": "1.0.0",
   "description": "Joins and minifies js files in dir. Can watch folder and work authomaticaly. Can ignore files of folder listed in ignore.json",
-  "main": "index.js",
+  "main": "joinjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
