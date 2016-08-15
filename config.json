@@ -1,5 +1,6 @@
 {
 	"resultFileName": "script.js",
 	"ignoreFileName": "ignore.json",
-	"dir": "./"
+	"dir": "./",
+	"userConfig": "joinconfig.json"
 }
