@@ -11,6 +11,11 @@ Function.prototype.delay = function(ms) {
     }
 }
 
+Function.prototype.inherit = function(superclass) {
+    this.prototype = Object.create(superclass.prototype);
+    this.prototype.constructor = this;
+}
+
 Array.prototype.remove = function(element) {
 	var index = this.indexOf(element);
 	if (index === -1) return false;

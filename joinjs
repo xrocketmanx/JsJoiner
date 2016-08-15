@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 var argv = require('minimist')(process.argv.slice(2));
-var FileManager = require('./file-manager');
 require('./extend');
+var FileManager = require('./file-manager');
 
 var userConfig = require('./config-manager')(argv._[0]);
 var fileManager = new FileManager(userConfig.js);
