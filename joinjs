@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 
 var argv = require('minimist')(process.argv.slice(2));
-var config = require('./config');
 var FileManager = require('./file-manager');
-require('./utils');
+require('./extend');
 
-var dir = argv._[0] || config.dir;
-var fileManager = new FileManager(dir);
+var userConfig = require('./config-manager')(argv._[0]);
+var fileManager = new FileManager(userConfig.js);
 var files = fileManager.getWatchedFiles();
 
 fileManager.joinFiles(files, argv['min']);
