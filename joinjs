@@ -5,10 +5,13 @@ var argv = require('minimist')(process.argv.slice(2));
 var JsFileJoiner = require('./controllers/js-file-joiner');
 var config = require('./config');
 
-var userConfig = require('./config-manager')(argv._[0]);
+var projectDirecory = argv._[0];
+var userConfig = require('./config-manager')(projectDirecory);
 var jsJoiner = new JsFileJoiner(userConfig.js, config.js);
 
-jsJoiner.joinFiles(argv['min']);
-if (!argv['watch']) return;
+var minify = argv['min'];
+jsJoiner.joinFiles(minify);
 
-jsJoiner.watch(argv['min']);
+if (argv['watch']) {
+	jsJoiner.watch(minify);
+}
