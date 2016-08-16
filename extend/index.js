@@ -14,6 +14,7 @@ Function.prototype.delay = function(ms) {
 Function.prototype.inherit = function(superclass) {
     this.prototype = Object.create(superclass.prototype);
     this.prototype.constructor = this;
+    this.prototype.super = superclass.prototype;
 }
 
 Array.prototype.remove = function(element) {

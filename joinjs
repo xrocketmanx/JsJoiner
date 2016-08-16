@@ -1,24 +1,14 @@
 #!/usr/bin/env node
 
-var argv = require('minimist')(process.argv.slice(2));
 require('./extend');
-var FileManager = require('./file-manager');
+var argv = require('minimist')(process.argv.slice(2));
+var JsFileJoiner = require('./controllers/js-file-joiner');
+var config = require('./config');
 
 var userConfig = require('./config-manager')(argv._[0]);
-var fileManager = new FileManager(userConfig.js);
-var files = fileManager.getWatchedFiles();
+var jsJoiner = new JsFileJoiner(userConfig.js, config.js);
 
-fileManager.joinFiles(files, argv['min']);
+jsJoiner.joinFiles(argv['min']);
 if (!argv['watch']) return;
 
-fileManager.watch(function(event, file) {
-	if (event === "rename" || event == "delete") {
-    	files.remove(file);
-	} else if (event === "change") {
-    	if (files.indexOf(file) >= 0) {
-        	fileManager.joinFiles(files, argv['min']);
-    	} else if (fileManager.isWatchFile(file)) {
-        	files.push(file);
-    	}
-    }  
-});
+jsJoiner.watch(argv['min']);
