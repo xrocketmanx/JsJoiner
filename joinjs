@@ -3,15 +3,19 @@
 require('./extend');
 var argv = require('minimist')(process.argv.slice(2));
 var JsFileJoiner = require('./controllers/js-file-joiner');
+var LessFileJoiner = require('./controllers/less-file-joiner');
 var config = require('./config');
 
 var projectDirecory = argv._[0];
 var userConfig = require('./config-manager')(projectDirecory);
 var jsJoiner = new JsFileJoiner(userConfig.js, config.js);
+var lessJoiner = new LessFileJoiner(userConfig.style, config.less);
 
 var minify = argv['min'];
 jsJoiner.joinFiles(minify);
+lessJoiner.joinFiles(minify);
 
 if (argv['watch']) {
 	jsJoiner.watch(minify);
+	lessJoiner.watch(minify);
 }

@@ -4,6 +4,11 @@
 		"ignoreFileName": "ignore.json",
 		"ext": "js"
 	},
+	"less": {
+		"resultFileName": "style.css",
+		"sourceFileName": "style.less",
+		"ext": "less"
+	},
 	"dir": "./",
 	"userConfig": "joinconfig.json"
 }
