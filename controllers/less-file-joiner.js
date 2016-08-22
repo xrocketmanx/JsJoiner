@@ -16,7 +16,7 @@ LessFileJoiner.prototype.joinFiles = function(minify) {
 		compress: minify
 	}, function(error, output) {
 		if (error) {
-			throw error;
+			console.log("Less error: " + error.message);
 		} else {
 			self.writeResult(output.css);
 		}
