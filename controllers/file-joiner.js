@@ -6,6 +6,9 @@ function FileJoiner(dir, config) {
 	this.dir = dir;
 	this.config = config;
 	this.ignoredFiles = this.getIgnoredFiles(); 
+
+	//delay not to produce many joins at once
+	this.joinWrapper = this.joinWrapper.delay(100);
 }
 
 FileJoiner.prototype.scan = function(watch, minify) {
@@ -13,10 +16,10 @@ FileJoiner.prototype.scan = function(watch, minify) {
 	this.watcher = chokidar.watch(this.dir, {
 		ignoreInitial: true,
 		ignored: function(file) {
-			return !self.isWatchFile(file) &&
-				!self.isDirectory(file);
+			return !(self.isWatchFile(file) || self.isDirectory(file));
 		}
 	});
+
 	this.watcher.on('ready', function() {
 		self.joinWrapper(minify);
 		if (watch) {
@@ -44,10 +47,10 @@ FileJoiner.prototype.joinWrapper = function(minify) {
 	var result = this.joinFiles(minify, function(result) {
 		self.writeResult(result);
 	});
-}.delay(100);
+};
 
 FileJoiner.prototype.writeResult = function(result) {
-	fs.writeFileSync(this.dir + this.config.resultFileName, result);
+	fs.writeFileSync(this.getPath(this.config.resultFileName), result);
 };
 
 FileJoiner.prototype.getWatchedFiles = function(dir) {
@@ -72,7 +75,7 @@ FileJoiner.prototype.isDirectory = function(file) {
 FileJoiner.prototype.getIgnoredFiles = function(config) {
 	if (!this.config.ignoreFileName) return [];
     
-    var ignoreFilePath = path.join(this.dir, this.config.ignoreFileName);
+    var ignoreFilePath = this.getPath(this.config.ignoreFileName);
     var ignored = [this.config.resultFileName];
 
     if (fs.existsSync(ignoreFilePath)) {
@@ -80,6 +83,10 @@ FileJoiner.prototype.getIgnoredFiles = function(config) {
         ignored.concat(userIgnored);
     }
     return ignored;
+};
+
+FileJoiner.prototype.getPath = function(file) {
+	return path.join(this.dir, file);
 };
 
 module.exports = FileJoiner;

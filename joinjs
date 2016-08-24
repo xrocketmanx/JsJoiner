@@ -2,16 +2,20 @@
 
 require('./extend');
 var argv = require('minimist')(process.argv.slice(2));
-var JsFileJoiner = require('./controllers/js-file-joiner');
-var LessFileJoiner = require('./controllers/less-file-joiner');
 var config = require('./config');
 
 var projectDirecory = argv._[0];
 var userConfig = require('./config-manager')(projectDirecory, config);
-var jsJoiner = new JsFileJoiner(userConfig.js, config.js);
-var lessJoiner = new LessFileJoiner(userConfig.style, config.less);
 
 var minify = argv['min'];
 var watch = argv['watch'];
-jsJoiner.scan(watch, minify);
-lessJoiner.scan(watch, minify);
+
+var joiners = {
+	js: require('./controllers/js-file-joiner'),
+	less: require('./controllers/less-file-joiner')
+}
+
+for (var key in userConfig) {
+	var joiner = new joiners[key](userConfig[key], config[key]);
+	joiner.scan(watch, minify);
+}
