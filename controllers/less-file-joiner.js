@@ -4,11 +4,10 @@ var FileJoiner = require('./file-joiner');
 
 function LessFileJoiner() {
 	FileJoiner.apply(this, arguments);
-	this.files = this.getWatchedFiles(this.dir);
 }
 LessFileJoiner.inherit(FileJoiner);
 
-LessFileJoiner.prototype.joinFiles = function(minify) {
+LessFileJoiner.prototype.joinFiles = function(minify, callback) {
 	var self = this;
 	var sourceFile = fs.readFileSync(this.getPath(this.config.sourceFileName));
 	less.render(sourceFile.toString(), {
@@ -18,9 +17,9 @@ LessFileJoiner.prototype.joinFiles = function(minify) {
 		if (error) {
 			console.log("Less error: " + error.message);
 		} else {
-			self.writeResult(output.css);
+			callback(output.css);
 		}
 	});
-}.delay(100);
+};
 
 module.exports = LessFileJoiner;

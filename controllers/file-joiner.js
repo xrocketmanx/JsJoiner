@@ -1,49 +1,85 @@
 var fs = require('fs');
 var path = require('path');
+var chokidar = require('chokidar');
 
 function FileJoiner(dir, config) {
 	this.dir = dir;
 	this.config = config;
-	//this.files = this.getWatchedFiles(this.dir); 
+	this.ignoredFiles = this.getIgnoredFiles(); 
 }
 
-FileJoiner.prototype.watch = function(minify) {
+FileJoiner.prototype.scan = function(watch, minify) {
 	var self = this;
-	fs.watch(self.dir, function(event, file) {
-		if (event === "rename" || event == "delete") {
-	    	self.files.remove(file);
-		} else if (event === "change") {
-	    	if (self.files.indexOf(file) >= 0) {
-	        	self.joinFiles(minify);
-	    	} else if (self.isWatchFile(file)) {
-	        	self.files.push(file);
-	    	}
-	    }
+	this.watcher = chokidar.watch(this.dir, {
+		ignoreInitial: true,
+		ignored: function(file) {
+			return !self.isWatchFile(file) &&
+				!self.isDirectory(file);
+		}
+	});
+	this.watcher.on('ready', function() {
+		self.joinWrapper(minify);
+		if (watch) {
+			self.watch(minify);
+		}
 	});
 };
 
-this.joinFiles = function(minify) {
+var events = ['add', 'change', 'unlink'];
+FileJoiner.prototype.watch = function(minify) {
+	var self = this;
+	this.watcher.on('all', function(event) {
+		if (events.contains(event)) {
+			self.joinWrapper(minify);
+		}
+	});
+};
+
+FileJoiner.prototype.joinFiles = function(minify, callback) {
 	//abstract
 };
 
-FileJoiner.prototype.getWatchedFiles = function(dir) {
+FileJoiner.prototype.joinWrapper = function(minify) {
 	var self = this;
-	return fs.readdirSync(dir).filter(function(file) {
-	    return self.isWatchFile(file);
+	var result = this.joinFiles(minify, function(result) {
+		self.writeResult(result);
 	});
-};
-
-FileJoiner.prototype.isWatchFile = function(file) {
-	//virtual
-    return file.indexOf(this.config.ext) === file.length - this.config.ext.length;
-};
+}.delay(100);
 
 FileJoiner.prototype.writeResult = function(result) {
 	fs.writeFileSync(this.dir + this.config.resultFileName, result);
 };
 
-FileJoiner.prototype.getPath = function(file) { 
-	return path.join(this.dir, file); 
+FileJoiner.prototype.getWatchedFiles = function(dir) {
+	return this.watcher.getWatched();
+};
+
+FileJoiner.prototype.isWatchFile = function(file) {
+	var regstr = '\\.' + this.config.ext + '$';
+    return new RegExp(regstr).test(file) && 
+    	!this.ignoredFiles.contains(file);
+};
+
+FileJoiner.prototype.isDirectory = function(file) {
+	try {
+		var stat = fs.statSync(file);
+		return stat.isDirectory();
+	} catch(error) {
+		return true;
+	}
+}
+
+FileJoiner.prototype.getIgnoredFiles = function(config) {
+	if (!this.config.ignoreFileName) return [];
+    
+    var ignoreFilePath = path.join(this.dir, this.config.ignoreFileName);
+    var ignored = [this.config.resultFileName];
+
+    if (fs.existsSync(ignoreFilePath)) {
+        var userIgnored = JSON.parse(fs.readFileSync(ignoreFilePath));
+        ignored.concat(userIgnored);
+    }
+    return ignored;
 };
 
 module.exports = FileJoiner;

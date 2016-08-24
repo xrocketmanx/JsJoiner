@@ -26,3 +26,7 @@ Array.prototype.remove = function(element) {
     this.length = this.length - 1;
     return true;
 }
+
+Array.prototype.contains = function(element) {
+    return this.indexOf(element) >= 0;
+}

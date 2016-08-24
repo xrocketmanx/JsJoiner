@@ -1,36 +1,25 @@
 var minifier = require('harp-minify');
 var fs = require('fs');
+var path = require('path');
 var FileJoiner = require('./file-joiner');
 
 function JsFileJoiner() {
 	FileJoiner.apply(this, arguments);
-	this.ignoredFiles = this.getIgnoredFiles();
-	this.files = this.getWatchedFiles(this.dir);
 }
 JsFileJoiner.inherit(FileJoiner);
 
-JsFileJoiner.prototype.joinFiles = function(minify) {
+JsFileJoiner.prototype.joinFiles = function(minify, callback) {
+    var files = this.getWatchedFiles();
     var buf = "";
-    for (var i = 0; i < this.files.length; i++) { 
-        buf += fs.readFileSync(this.getPath(this.files[i]));
+    for (var dir in files) {
+        var dirFiles = files[dir];
+        for (var i = 0; i < dirFiles.length; i++) {
+            if (this.isWatchFile(dirFiles[i])) {
+                buf += fs.readFileSync(path.join(dir, dirFiles[i]));
+            }
+        } 
     }
-    this.writeResult(minify ? minifier.js(buf) : buf);
-}.delay(100);
-
-JsFileJoiner.prototype.isWatchFile = function(file) {
-	return this.super.isWatchFile.call(this, file) &&
-		this.ignoredFiles.indexOf(file) === -1;
+    callback(minify ? minifier.js(buf) : buf);
 };
-
-JsFileJoiner.prototype.getIgnoredFiles = function(config) {
-    var ignoreFilePath = this.getPath(this.config.ignoreFileName);
-    var ignored = [this.config.resultFileName];
-
-    if (fs.existsSync(ignoreFilePath)) {
-        var userIgnored = JSON.parse(fs.readFileSync(ignoreFilePath));
-        ignored.concat(userIgnored);
-    }
-    return ignored;
-}
 
 module.exports = JsFileJoiner;

@@ -12,10 +12,6 @@ var jsJoiner = new JsFileJoiner(userConfig.js, config.js);
 var lessJoiner = new LessFileJoiner(userConfig.style, config.less);
 
 var minify = argv['min'];
-jsJoiner.joinFiles(minify);
-lessJoiner.joinFiles(minify);
-
-if (argv['watch']) {
-	jsJoiner.watch(minify);
-	lessJoiner.watch(minify);
-}
+var watch = argv['watch'];
+jsJoiner.scan(watch, minify);
+lessJoiner.scan(watch, minify);
