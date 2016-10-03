@@ -16,6 +16,8 @@ var joiners = {
 }
 
 for (var key in userConfig) {
-	var joiner = new joiners[key](userConfig[key], config[key]);
-	joiner.scan(watch, minify);
+	userConfig[key].forEach(function(path) {
+		var joiner = new joiners[key](path, config[key]);
+		joiner.scan(watch, minify);
+	});
 }

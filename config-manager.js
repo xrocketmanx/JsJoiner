@@ -6,7 +6,9 @@ module.exports = function(dir, config) {
 	var configPath = path.join(dir, config.userConfig);
 	var userConfig = JSON.parse(fs.readFileSync(configPath));
 	for (var key in userConfig) {
-		userConfig[key] = path.join(dir, userConfig[key]);
+		userConfig[key].map(function(el) {
+			return path.join(dir, el);
+		});
 	}
 	return userConfig;
 };

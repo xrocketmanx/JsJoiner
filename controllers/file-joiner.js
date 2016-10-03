@@ -23,10 +23,10 @@ FileJoiner.prototype.scan = function(watch, minify) {
 	this.watcher.on('ready', function() {
 		self.joinWrapper(minify);
 		if (watch) {
-			console.log('watching...');
+			console.log('watching ' + self.dir);
 			self.watch(minify);
 		} else {
-			console.log('end...');
+			console.log('end ' + self.dir);
 			self.watcher.close();
 		}
 	});
